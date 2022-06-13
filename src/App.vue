@@ -1,34 +1,60 @@
 <template>
     <div class="container">
         <todo-form @create="createTodo" />
-        <todo-list :todos="todos" />
+        <sort-select v-model="selectedSort" :options="sortOptions" />
+        <custom-input v-model="searchQuery" placeholder="Search by title..." />
+        <todo-list :todos="sortedAndSearchedTodos" @delete="deleteTodo" />
     </div>
 </template>
 
 <script>
 import TodoForm from '@/components/TodoForm';
 import TodoList from '@/components/TodoList';
+import SortSelect from '@/components/ui/SortSelect';
+import CustomInput from '@/components/ui/CustomInput';
 
 export default {
     components: {
         TodoForm,
-        TodoList
+        TodoList,
+        SortSelect,
+        CustomInput
     },
     data() {
         return {
-            todos: [{id: 1, title: 'Test', desc: 'Hello todo.', img: ''}],
+            todos: [
+                {id: 1, title: 'Test', desc: 'Hello todo.', img: '', checked: false},
+                {id: 2, title: 'Dest', desc: 'Ye todo.', img: '', checked: false},
+            ],
+            sortOptions: [
+				{ value: 'title', name: 'By title' },
+				{ value: 'desc', name: 'By description' },
+			],
+            selectedSort: '',
+            searchQuery: ''
         }
     },
     methods: {
         createTodo(todo) {
             this.todos.push(todo);
 		},
-		removeTodo(todo) {
+		deleteTodo(todo) {
 			this.todos = this.todos.filter(t => t.id !== todo.id);
 		},
     },
     mounted() {
         console.log(this.todos, 'mount');
+    },
+    computed: {
+        sortedTodos() {
+			return [...this.todos].sort((todo1, todo2) => {
+				return todo1[this.selectedSort]?.localeCompare(todo2[this.selectedSort]);
+			})
+		},
+		sortedAndSearchedTodos() {
+			return this.sortedTodos
+				.filter(todo => todo.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
+		}
     },
     watch: {
         todo: {
@@ -97,6 +123,12 @@ select {
 
 a {
     text-decoration: none;
+}
+
+body {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
 }
 
 #app {

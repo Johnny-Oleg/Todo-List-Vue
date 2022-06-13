@@ -1,23 +1,33 @@
 <template>
     <form class="todo-form" @submit.prevent>
-        <input 
-			class="todo-input" 
-			v-model.trim="todo.title" 
-			type="text" 
-			placeholder="Title..."
-		/>
+        <div class="todo-form-wrapper">
+            <custom-input 
+                v-model.trim="todo.title" 
+                type="text" 
+                placeholder="Title..."
+                required
+            />
+            <cta-button @click="createTodo">Add todo</cta-button>
+        </div>
         <textarea 
-			class="todo-input" 
+			class="todo-desc" 
 			v-model="todo.desc" 
 			type="text" 
 			placeholder="Description..."
+            required
 		/>
-        <button class="todo__btn" @click="createTodo">Add todo</button>
     </form>
 </template>
 
 <script>
+import CtaButton from '@/components/ui/CtaButton';
+import CustomInput from '@/components/ui/CustomInput';
+
 export default {
+    components: {
+        CtaButton,
+        CustomInput
+    },
     data() {
         return {
             todo: {
@@ -29,9 +39,13 @@ export default {
     },
     methods: {
         createTodo() {
+            if (this.todo.title === '' || this.todo.desc === '') return;
+
             const random = arr => arr[Math.floor(Math.random() * arr.length)];
+
             this.todo.id = Date.now();
             this.todo.img = random(this.images);
+
             this.$emit('create', this.todo);
 
             this.todo = {
@@ -66,6 +80,19 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.todo-form {
 
+}
+
+.todo-desc {
+    width: 300px;
+    height: 100px;
+    padding: 12px 24px;
+	border-radius: 15px;
+	border: 2px solid #e5e5e5;
+	word-break: break-all;
+	line-height: 39px;
+	overflow: visible;
+}
 </style>
