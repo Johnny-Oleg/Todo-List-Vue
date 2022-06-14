@@ -1,37 +1,58 @@
 <template>
-	<div class="todo-list-item" :class="{ active: isChecked }">
-		<div class="list-item-img">
-			<img :src="todo.img" alt="image" />
-		</div>
-		<div class="list-item-info">
-			<h3 class="list-item-title">{{ todo.title }}</h3>
-			<div class="list-item-wrapper">
-				<p class="list-item-text">
-					<span>{{ todo.desc }}</span>
-				</p>
-				<div class="decor-wrapper">
-					<div class="decor-item"></div>
+	<div class="todo-list-wrapper">
+		<div class="todo-list-item" :class="{ active: todo.checked }">
+			<div class="list-item-img">
+				<img :src="todo.img" alt="image" />
+			</div>
+			<div class="list-item-info">
+				<div class="list-item-check" v-show="todo.checked">
+					<img src="@/assets/logo.png" alt="image">
+				</div>
+				<h3 class="list-item-title">{{ todo.title }}</h3>
+				<div class="list-item-wrapper">
+					<p class="list-item-text">
+						<span>{{ todo.desc }}</span>
+					</p>
+					<div class="decor-wrapper">
+						<div class="decor-item"></div>
+					</div>
 				</div>
 			</div>
+			<div class="list-item-btns">
+				<!-- <input 
+					class="list-item-check" 
+					v-model="this.isChecked" 
+					@change="check($event)"
+					type="checkbox"
+				> -->
+				<cta-button 
+					:class="{ done: todo.checked, todo: !todo.checked }"
+					@click="$emit('complete', todo)"
+				>
+					{{ todo.checked ? 'Done' : 'To do' }}
+				</cta-button>
+				<cta-button @click="showModal">Change</cta-button>
+				<cta-button @click="$emit('delete', todo)">Delete</cta-button>
+			</div>
 		</div>
-		<div class="list-item-btns">
-			<input 
-				class="list-item-chech" 
-				v-model="this.isChecked" 
-				@change="check($event)"
-				type="checkbox"
-			>
-			<cta-button @click="$emit('delete', todo)">Delete</cta-button>
-		</div>
+		<todo-change 
+			@change="$emit('change', todo)" 
+			v-model:show="isVisible" 
+			:id="todo.id"
+		/>
 	</div>
 </template>
 
 <script>
 import CtaButton from '@/components/ui/CtaButton';
+import TodoChange from '@/components/ui/TodoChange';
+import logo from '@/assets/logo.png';
 
 export default {
 	components: {
-		CtaButton
+		CtaButton,
+		TodoChange,
+		logo
 	},
     props: {
 		todo: {
@@ -41,18 +62,27 @@ export default {
 	},
 	data() {
 		return {
-			isChecked: false
+			isVisible: false
+			// isChecked: false
 		}
 	},
 	methods: {
-		check({ target: { checked } }) {
-			this.isChecked = checked;
+		showModal() {
+			this.isVisible = true;
 		}
+		// check({ target: { checked } }) {
+		// 	this.isChecked = checked;
+		// }
 	}
 }
 </script>
 
 <style scoped>
+.todo-list-wrapper {
+	display: flex;
+	justify-content: space-between;
+}
+
 .todo-list-item {
     width: 680px;
 	height: 300px;
@@ -71,6 +101,20 @@ export default {
 	border-color: #42b983;
 }
 
+.todo {
+	background-color: #fff;
+	color: inherit;
+	border: 1px solid #e5e5e5;
+	border-bottom: 4px solid #e5e5e5;
+}
+
+.done {
+	background-color: #42b983;
+	color: #fff;
+	border: 0px solid transparent;
+	border-bottom: 4px solid #207850;
+}
+
 .list-item-img {
 	max-width: 114px;
 	flex: 1 0 114px;
@@ -87,6 +131,15 @@ export default {
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
+	position: relative;
+}
+
+.list-item-check {
+	width: 16px;
+	height: 16px;
+	position: absolute;
+	top: 35px;
+	left: -20px;
 }
 
 .list-item-title {
@@ -115,6 +168,7 @@ export default {
 }
 
 .list-item-btns {
+	height: 100%;
 	flex: 0 0 auto;
 	display: flex;
 	flex-direction: column;

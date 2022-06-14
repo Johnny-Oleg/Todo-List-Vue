@@ -3,7 +3,12 @@
         <todo-form @create="createTodo" />
         <sort-select v-model="selectedSort" :options="sortOptions" />
         <custom-input v-model="searchQuery" placeholder="Search by title..." />
-        <todo-list :todos="sortedAndSearchedTodos" @delete="deleteTodo" />
+        <todo-list 
+            :todos="sortedAndSearchedTodos" 
+            @complete="completeTodo"
+            @change="changeTodo" 
+            @delete="deleteTodo" 
+        />
     </div>
 </template>
 
@@ -38,6 +43,21 @@ export default {
         createTodo(todo) {
             this.todos.push(todo);
 		},
+        completeTodo(todo) {
+            this.todos.map(t => {
+                if (t.id === todo.id) {
+                    t.checked = !t.checked;
+                }
+
+                return t;
+            })
+        },
+        changeTodo(todo) {
+            console.log(todo.id, todo.title, todo);
+            this.todos.map(t => t.id === todo.id ?
+                {...t, title: todo.title, desc: todo.desc} : t
+            );
+        },
 		deleteTodo(todo) {
 			this.todos = this.todos.filter(t => t.id !== todo.id);
 		},

@@ -7,6 +7,8 @@
 					v-for="todo in todos" 
 					:todo="todo" 
 					:key="todo.id" 
+					@complete="$emit('complete', todo)"
+					@change="$emit('change', todo)"
 					@delete="$emit('delete', todo)"
 				/>
 			</transition-group>
