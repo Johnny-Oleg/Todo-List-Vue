@@ -31,15 +31,19 @@
 				>
 					{{ todo.checked ? 'Done' : 'To do' }}
 				</cta-button>
-				<cta-button @click="showModal">Change</cta-button>
+				<cta-button @click="showModal">
+					{{ isVisible ? 'Close' : 'Edit' }}
+				</cta-button>
 				<cta-button @click="$emit('delete', todo)">Delete</cta-button>
 			</div>
 		</div>
-		<todo-change 
-			@change="$emit('change', todo)" 
-			v-model:show="isVisible" 
-			:id="todo.id"
-		/>
+		  <transition name="slide-fade">
+			<todo-change 
+				@change="$emit('change', todo)" 
+				v-model:show="isVisible" 
+				:id="todo.id"
+			/>
+		  </transition>
 	</div>
 </template>
 
@@ -62,13 +66,13 @@ export default {
 	},
 	data() {
 		return {
-			isVisible: false
+			isVisible: false,
 			// isChecked: false
 		}
 	},
 	methods: {
 		showModal() {
-			this.isVisible = true;
+			this.isVisible = !this.isVisible;
 		}
 		// check({ target: { checked } }) {
 		// 	this.isChecked = checked;
@@ -95,6 +99,7 @@ export default {
 	background-color: #fff;
 	border-radius: 16px;
 	border: 2px solid #e5e5e5;
+	transition: all 0.3s ease-in-out;
 }
 
 .active {
@@ -111,7 +116,7 @@ export default {
 .done {
 	background-color: #42b983;
 	color: #fff;
-	border: 0px solid transparent;
+	border: 1px solid transparent;
 	border-bottom: 4px solid #207850;
 }
 
@@ -169,7 +174,7 @@ export default {
 
 .list-item-btns {
 	height: 100%;
-	flex: 0 0 auto;
+	flex: 0 0 90px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-around;
@@ -197,5 +202,16 @@ export default {
 	background-color: #fff;
     transform: rotate(45deg);
     transform-origin: top left;
+}
+
+.slide-fade-enter-active {
+  	transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  	transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  	transform: translateX(10px);
+  	opacity: 0;
 }
 </style>

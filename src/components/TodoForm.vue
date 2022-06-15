@@ -5,7 +5,6 @@
                 v-model.trim="todo.title" 
                 type="text" 
                 placeholder="Title..."
-                required
             />
             <cta-button @click="createTodo">Add todo</cta-button>
         </div>
@@ -14,7 +13,7 @@
 			v-model="todo.desc" 
 			type="text" 
 			placeholder="Description..."
-            required
+            maxlength="100"
 		/>
     </form>
 </template>
@@ -31,8 +30,11 @@ export default {
     data() {
         return {
             todo: {
+                id: '',
                 title: '',
                 desc: '',
+                img: '',
+                checked: false
             },
             // images: []
         }
@@ -82,7 +84,14 @@ export default {
 
 <style scoped>
 .todo-form {
+    width: 430px;
+}
 
+.todo-form-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
 }
 
 .todo-desc {

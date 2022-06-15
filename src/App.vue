@@ -1,8 +1,12 @@
 <template>
     <div class="container">
-        <todo-form @create="createTodo" />
-        <sort-select v-model="selectedSort" :options="sortOptions" />
-        <custom-input v-model="searchQuery" placeholder="Search by title..." />
+        <div class="header">
+            <todo-form @create="createTodo" />
+            <div class="header-wrapper">
+                <custom-input v-model="searchQuery" placeholder="Search by title..." />
+                <sort-select v-model="selectedSort" :options="sortOptions" />
+            </div>
+        </div>
         <todo-list 
             :todos="sortedAndSearchedTodos" 
             @complete="completeTodo"
@@ -27,10 +31,7 @@ export default {
     },
     data() {
         return {
-            todos: [
-                {id: 1, title: 'Test', desc: 'Hello todo.', img: '', checked: false},
-                {id: 2, title: 'Dest', desc: 'Ye todo.', img: '', checked: false},
-            ],
+            todos: [],
             sortOptions: [
 				{ value: 'title', name: 'By title' },
 				{ value: 'desc', name: 'By description' },
@@ -61,8 +62,19 @@ export default {
 		deleteTodo(todo) {
 			this.todos = this.todos.filter(t => t.id !== todo.id);
 		},
+        async fetchTodos() {
+            if (localStorage.getItem('todos')) {
+                try {
+                    this.todos = await JSON.parse(localStorage.getItem('todos'));
+                } catch(e) {
+                    localStorage.removeItem('todos');
+                }
+            }
+        },
     },
     mounted() {
+        this.fetchTodos();
+       
         console.log(this.todos, 'mount');
     },
     computed: {
@@ -74,12 +86,20 @@ export default {
 		sortedAndSearchedTodos() {
 			return this.sortedTodos
 				.filter(todo => todo.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
-		}
+		},
     },
     watch: {
         todo: {
             handler(newValue) {
                 console.log(newValue);
+            },
+            deep: true
+        },
+        todos: {
+            handler(newTodos) {
+                const parsed = JSON.stringify(newTodos);
+
+                localStorage.setItem('todos', parsed);
             },
             deep: true
         }
@@ -149,24 +169,33 @@ body {
     font-size: 16px;
     line-height: 24px;
     font-weight: 400;
+    background-color: #fff;
 }
 
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
     min-height: 100vh;
-    background-image: url(./assets/bg.jpg);
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
     color: #2c3e50;
+    padding-top: 20px;
 }
 
 .container {
     max-width: 1240px;
     margin: 0 auto;
-    padding: 15px;
+    padding: 0 15px;
+}
+
+.header {
+    width: 800px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+}
+
+.header-wrapper {
+    display: flex;
+    flex-direction: column;
 }
 </style>

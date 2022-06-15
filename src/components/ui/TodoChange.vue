@@ -6,7 +6,6 @@
 					v-model.trim="todo.title" 
 					type="text" 
 					placeholder="Title..."
-					    v-on:input="$emit('input', $event.target.value)"
 
 				/>
 				<cta-button @click="changeTodo">Save changes</cta-button>
@@ -16,6 +15,7 @@
 				v-model="todo.desc" 
 				type="text" 
 				placeholder="Description..."
+                maxlength="100"
 			/>
 		</form>
 	</div>
@@ -46,18 +46,17 @@ export default {
         }
     },
     methods: {
-        changeTodo(e) {
+        changeTodo() {
             if (this.todo.title === '' || this.todo.desc === '') return;
-
+			
             this.$emit('change', this.todo);
-			            this.$emit('input', e.target.value)
 
             this.todo = {
                 title: '',
                 desc: '',
             }
 			console.log(this.id, this.title, this.desc, this.todo);
-			// this.$emit('update:show', false);
+			this.$emit('update:show', false);
         },
     },
     watch: {
@@ -72,8 +71,29 @@ export default {
 </script>
 
 <style scoped>
-.todo-form {
+.form-wrapper {
+    width: 500px;
+    height: 300px;
+	margin-bottom: 30px;
+	padding: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 30px;
+	background-color: #fff;
+	border-radius: 16px;
+	border: 2px solid #e5e5e5;
+}
 
+.todo-form {
+    width: 100%;
+}
+
+.todo-form-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
 }
 
 .todo-desc {
