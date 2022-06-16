@@ -53,6 +53,7 @@ export default {
 
             this.todo.id = Date.now();
             this.todo.img = random(this.images);
+            this.todo.completed = false;
 
             this.setCreateTodo(this.todo);
 
