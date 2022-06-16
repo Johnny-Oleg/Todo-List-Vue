@@ -1,11 +1,11 @@
 <template>
 	<div class="todo-list-wrapper">
-		<div class="todo-list-item" :class="{ active: todo.checked }">
+		<div class="todo-list-item" :class="{ active: todo.completed }">
 			<div class="list-item-img">
 				<img :src="todo.img" alt="image" />
 			</div>
 			<div class="list-item-info">
-				<div class="list-item-check" v-show="todo.checked">
+				<div class="list-item-check" v-show="todo.completed">
 					<img src="@/assets/logo.png" alt="image">
 				</div>
 				<h3 class="list-item-title">{{ todo.title }}</h3>
@@ -19,27 +19,23 @@
 				</div>
 			</div>
 			<div class="list-item-btns">
-				<!-- <input 
-					class="list-item-check" 
-					v-model="this.isChecked" 
-					@change="check($event)"
-					type="checkbox"
-				> -->
 				<cta-button 
-					:class="{ done: todo.checked, todo: !todo.checked }"
-					@click="$emit('complete', todo)"
+					:class="{ done: todo.completed, todo: !todo.completed }"
+					@click="completeTodo"
 				>
-					{{ todo.checked ? 'Done' : 'To do' }}
+					{{ todo.completed ? 'Done' : 'To do' }}
 				</cta-button>
-				<cta-button @click="showModal">
+				<cta-button 
+					:class="{ done: !isVisible, todo: isVisible }"
+					@click="showModal"
+				>
 					{{ isVisible ? 'Close' : 'Edit' }}
 				</cta-button>
-				<cta-button @click="$emit('delete', todo)">Delete</cta-button>
+				<cta-button @click="deleteTodo">Delete</cta-button>
 			</div>
 		</div>
 		  <transition name="slide-fade">
 			<todo-change 
-				@change="$emit('change', todo)" 
 				v-model:show="isVisible" 
 				:id="todo.id"
 			/>
@@ -48,6 +44,8 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+
 import CtaButton from '@/components/ui/CtaButton';
 import TodoChange from '@/components/ui/TodoChange';
 import logo from '@/assets/logo.png';
@@ -67,16 +65,22 @@ export default {
 	data() {
 		return {
 			isVisible: false,
-			// isChecked: false
 		}
 	},
 	methods: {
+		...mapMutations({
+			setCompleteTodo: 'todo/setCompleteTodo',
+			setDeleteTodo: 'todo/setDeleteTodo',
+		}),
+		completeTodo() {
+			this.setCompleteTodo(this.todo.id);
+		},
+		deleteTodo() {
+			this.setDeleteTodo(this.todo.id);
+		},
 		showModal() {
 			this.isVisible = !this.isVisible;
 		}
-		// check({ target: { checked } }) {
-		// 	this.isChecked = checked;
-		// }
 	}
 }
 </script>
@@ -88,8 +92,8 @@ export default {
 }
 
 .todo-list-item {
-    width: 680px;
-	height: 300px;
+    width: 690px;
+	min-height: 300px;
 	margin-bottom: 30px;
 	padding: 20px;
 	display: flex;
@@ -148,9 +152,11 @@ export default {
 }
 
 .list-item-title {
+	max-width: 380px;
 	margin: 20px 0 30px 0;
 	font-size: 32px;
 	line-height: 40px;
+	word-break: break-all;
 }
 
 .list-item-wrapper {
@@ -192,7 +198,7 @@ export default {
 }
 
 .decor-item {
-    content: "";
+    content: '';
     width: 14.14427px;
     height: 14.14427px;
 	position: absolute;
@@ -207,11 +213,84 @@ export default {
 .slide-fade-enter-active {
   	transition: all .3s ease;
 }
+
 .slide-fade-leave-active {
   	transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
+
 .slide-fade-enter, .slide-fade-leave-to {
   	transform: translateX(10px);
   	opacity: 0;
+}
+
+@media (max-width: 1220px) {
+	.todo-list-wrapper {
+		flex-direction: column;
+		align-items: center;
+	}
+	.list-item-info {
+		min-height: 260px;
+	}
+	.list-item-btns {
+		min-height: 260px;
+	}
+}
+
+@media (max-width: 730px) {
+	.todo-list-item {
+		width: 100%;
+		flex-wrap: wrap;
+	}
+	.list-item-img {
+		order: 2;
+	}
+	.list-item-info {
+		min-height: initial;
+		flex: 0 0 90%;
+		margin: 0 auto;
+	}
+	.list-item-title,
+	.list-item-text {
+		max-width: initial;
+		width: 100%;
+	}
+	.list-item-btns {
+		min-height: 172px;
+		order: 3;
+		flex: 1 0 auto;
+		align-items: center;
+		flex-direction: row;
+	}
+}
+
+@media (max-width: 525px) {
+	.list-item-title {
+		font-size: 20px;
+		line-height: 28px;
+	}
+	.list-item-check {
+		top: 26px;
+	}
+	.list-item-btns {
+		min-height: 200px;
+		flex-direction: column;
+		align-items: flex-end;
+	}
+}
+
+@media (max-width: 310px) {
+	.list-item-img {
+		display: none;
+	}
+	.list-item-title {
+		font-size: 18px;
+		line-height: 26px;
+	}
+	.list-item-check {
+		top: 24px;
+	}
+	.list-item-btns {
+		align-items: center;
+	}
 }
 </style>

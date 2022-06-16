@@ -20,4 +20,10 @@ export default {
 	border-radius: 12px;
 	cursor: pointer;
 }
+
+@media (max-width: 730px) {
+	.cta-btn {
+		min-width: 90px;
+	}
+}
 </style>

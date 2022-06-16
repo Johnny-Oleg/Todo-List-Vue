@@ -12,7 +12,7 @@ export default {
 	name: 'sort-select',
 	props: {
 		modelValue: {
-			type: String
+			type: [String, Boolean]
 		},
 		options: {
 			type: Array,
@@ -37,5 +37,11 @@ export default {
 	border-radius: 15px;
 	border: 2px solid #e5e5e5;
 	line-height: 39px;
+}
+
+@media (max-width: 370px) {
+	.select {
+		width: 100%;
+	}
 }
 </style>

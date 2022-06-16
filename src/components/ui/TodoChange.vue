@@ -6,22 +6,25 @@
 					v-model.trim="todo.title" 
 					type="text" 
 					placeholder="Title..."
-
 				/>
+				<textarea 
+					class="todo-desc" 
+					v-model.trim="todo.desc" 
+					type="text" 
+					placeholder="Description..."
+					maxlength="100"
+				/>
+			</div>
+			<div class="todo-form-btn">
 				<cta-button @click="changeTodo">Save changes</cta-button>
 			</div>
-			<textarea 
-				class="todo-desc" 
-				v-model="todo.desc" 
-				type="text" 
-				placeholder="Description..."
-                maxlength="100"
-			/>
 		</form>
 	</div>
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+
 import CtaButton from '@/components/ui/CtaButton';
 import CustomInput from '@/components/ui/CustomInput';
 
@@ -39,30 +42,34 @@ export default {
     data() {
         return {
             todo: {
-				id: this.id,
+				id: '',
                 title: '',
                 desc: '',
             },
         }
     },
     methods: {
-        changeTodo() {
-            if (this.todo.title === '' || this.todo.desc === '') return;
+		...mapMutations({
+			setChangeTodo: 'todo/setChangeTodo',
+		}),
+		changeTodo() {
+			if (this.todo.title === '' && this.todo.desc === '') return;
 			
-            this.$emit('change', this.todo);
+			this.todo.id = this.id;
+			this.setChangeTodo(this.todo);
 
             this.todo = {
                 title: '',
                 desc: '',
             }
-			console.log(this.id, this.title, this.desc, this.todo);
-			this.$emit('update:show', false);
+
+			this.$emit('update:show', false);	
         },
     },
     watch: {
         todo: {
             handler(newValue) {
-                console.log(newValue);
+                // console.log(newValue);
             },
             deep: true,
         },
@@ -87,23 +94,58 @@ export default {
 
 .todo-form {
     width: 100%;
+	display: flex;
 }
 
 .todo-form-wrapper {
     width: 100%;
     display: flex;
+	flex-direction: column;
     justify-content: space-between;
-    margin-bottom: 30px;
 }
 
 .todo-desc {
     width: 300px;
     height: 100px;
+	margin-top: 30px;
     padding: 12px 24px;
 	border-radius: 15px;
 	border: 2px solid #e5e5e5;
 	word-break: break-all;
 	line-height: 39px;
 	overflow: visible;
+	resize: none;
+}
+
+.todo-form-btn {
+	min-width: 130px;
+	align-self: flex-end;
+}
+
+@media (max-width: 525px) {
+	.form-wrapper{
+		width: 100%;
+	}
+}
+
+@media (max-width: 510px) {
+	.todo-form {
+		flex-wrap: wrap;
+	}
+	.todo-form-wrapper {
+		align-items: center;
+	}
+	.todo-desc {
+		margin-bottom: 30px;
+	}
+	.todo-form-btn {
+		margin: 0 auto;
+	}
+}
+
+@media (max-width: 370px) {
+	.todo-desc {
+		width: 100%;
+	}
 }
 </style>

@@ -1,22 +1,27 @@
 <template>
     <div class="container">
         <div class="header">
-            <todo-form @create="createTodo" />
+            <todo-form />
             <div class="header-wrapper">
-                <custom-input v-model="searchQuery" placeholder="Search by title..." />
-                <sort-select v-model="selectedSort" :options="sortOptions" />
+                <custom-input 
+                    :model-value="searchQuery" 
+                    @update:model-value="setSearchQuery" 
+                    placeholder="Search by title..." 
+                />
+                <sort-select
+                    :model-value="selectedSort" 
+                    @update:model-value="setSelectedSort" 
+                    :options="sortOptions" 
+                />
             </div>
         </div>
-        <todo-list 
-            :todos="sortedAndSearchedTodos" 
-            @complete="completeTodo"
-            @change="changeTodo" 
-            @delete="deleteTodo" 
-        />
+        <todo-list :todos="sortedAndSearchedTodos || []" />
     </div>
 </template>
 
 <script>
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex';
+
 import TodoForm from '@/components/TodoForm';
 import TodoList from '@/components/TodoList';
 import SortSelect from '@/components/ui/SortSelect';
@@ -31,67 +36,36 @@ export default {
     },
     data() {
         return {
-            todos: [],
-            sortOptions: [
-				{ value: 'title', name: 'By title' },
-				{ value: 'desc', name: 'By description' },
-			],
-            selectedSort: '',
-            searchQuery: ''
         }
     },
     methods: {
-        createTodo(todo) {
-            this.todos.push(todo);
-		},
-        completeTodo(todo) {
-            this.todos.map(t => {
-                if (t.id === todo.id) {
-                    t.checked = !t.checked;
-                }
-
-                return t;
-            })
-        },
-        changeTodo(todo) {
-            console.log(todo.id, todo.title, todo);
-            this.todos.map(t => t.id === todo.id ?
-                {...t, title: todo.title, desc: todo.desc} : t
-            );
-        },
-		deleteTodo(todo) {
-			this.todos = this.todos.filter(t => t.id !== todo.id);
-		},
-        async fetchTodos() {
-            if (localStorage.getItem('todos')) {
-                try {
-                    this.todos = await JSON.parse(localStorage.getItem('todos'));
-                } catch(e) {
-                    localStorage.removeItem('todos');
-                }
-            }
-        },
+        ...mapMutations({
+			setSearchQuery: 'todo/setSearchQuery',
+			setSelectedSort: 'todo/setSelectedSort'
+		}),
+		...mapActions({
+			fetchTodos: 'todo/fetchTodos'
+		}),
     },
     mounted() {
-        this.fetchTodos();
-       
-        console.log(this.todos, 'mount');
+        this.fetchTodos();       
     },
     computed: {
-        sortedTodos() {
-			return [...this.todos].sort((todo1, todo2) => {
-				return todo1[this.selectedSort]?.localeCompare(todo2[this.selectedSort]);
-			})
-		},
-		sortedAndSearchedTodos() {
-			return this.sortedTodos
-				.filter(todo => todo.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
-		},
+        ...mapState({
+			todos: state => state.todo.todos,
+			selectedSort: state => state.todo.selectedSort,
+			searchQuery: state => state.todo.searchQuery,
+			sortOptions: state => state.todo.sortOptions,
+		}),
+		...mapGetters({
+			sortedTodos: 'todo/sortedTodos',
+			sortedAndSearchedTodos: 'todo/sortedAndSearchedTodos'
+		})
     },
     watch: {
         todo: {
             handler(newValue) {
-                console.log(newValue);
+                // console.log(newValue);
             },
             deep: true
         },
@@ -188,7 +162,7 @@ body {
 }
 
 .header {
-    width: 800px;
+    max-width: 800px;
     display: flex;
     justify-content: space-between;
     margin-bottom: 50px;
@@ -197,5 +171,38 @@ body {
 .header-wrapper {
     display: flex;
     flex-direction: column;
+}
+
+@media (max-width: 1220px) {
+    .header {
+        margin: 0 auto 50px;
+    }
+}
+
+@media (max-width: 830px) {
+    .header {
+        justify-content: center;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 799px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 510px) {
+    .header {
+        align-items: center;
+    }
+}
+
+@media (max-width: 370px) {
+	.header-wrapper {
+		width: 100%;
+        margin-top: 20px;
+	}
 }
 </style>

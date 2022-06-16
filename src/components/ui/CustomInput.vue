@@ -4,6 +4,7 @@
 		:value="modelValue" 
 		@input="updateInput" 
 		type="text"
+		maxlength="30"
 	>
 </template>
 
@@ -30,5 +31,11 @@ export default {
 	border: 2px solid #e5e5e5;
 	line-height: 39px;
 	overflow: visible;
+}
+
+@media (max-width: 370px) {
+	.todo-input {
+		width: 100%;
+	}
 }
 </style>
