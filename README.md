@@ -1,5 +1,11 @@
 # todo-list-vue
 
+Simple todo list in Vue3 + Vuex. 
+
+<img src="https://i.imgur.com/Ai5p5Nt.png)" alt="screenshot" width="300"/>
+
+https://johnny-oleg.github.io/Todo-List-Vue/
+
 ## Project setup
 ```
 npm install
